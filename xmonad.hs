@@ -1,10 +1,16 @@
 import XMonad
-import XMonad.Util.EZConfig(additionalKeys)
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Layout.NoBorders
+import XMonad.Config.Azerty (azertyKeys)
 import XMonad.Config.Azerty
+import XMonad.Util.CustomKeys (customKeys)
+import XMonad.Prompt
+import XMonad.Prompt.Shell
+
 import System.Posix.Env (putEnv)
 import System.Process(spawnProcess)
+
+import qualified Data.Map as M
 
 main :: IO ()
 main = do
@@ -14,8 +20,8 @@ main = do
   xsetbg
   emacs
   clipit
-  redshift
-  xmonad $ azertyConfig
+  -- redshift
+  xmonad $ defaultConfig
     { modMask = mod4Mask --  Use Super instead of Alt
     , handleEventHook    = fullscreenEventHook
     , layoutHook         = myLayout
@@ -23,19 +29,33 @@ main = do
     , terminal           = "evilvte"
     , normalBorderColor  = "#cccccc"
     , focusedBorderColor = "#cd8b00"
+    , keys = myKeys <+> azertyKeys <+> keys def
     }
+
+myKeys = customKeys delkeys inskeys
+
+delkeys = const []
+
+inskeys (XConfig {modMask = modm}) =
+  [ ((modm .|. shiftMask, xK_p), myPrompt)
+  , ((modm .|. shiftMask, xK_i), spawn "iceweasel")
+  , ((modm .|. shiftMask, xK_e), spawn "cemacs")
+  ]
+
+myPrompt = shellPrompt greenXPConfig
+           { font = "-misc-fixed-*-*-*-*-18-*-*-*-*-*-*-*"
+           , height = 25
+           , promptKeymap = emacsLikeXPKeymap
+           }
 
 myLayout = tiled ||| Mirror tiled ||| smartBorders Full
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
-
      -- The default number of windows in the master pane
      nmaster = 1
-
      -- Default proportion of screen occupied by master pane
      ratio   = 1/2
-
      -- Percent of screen to increment by when resizing panes
      delta   = 3/100
 
