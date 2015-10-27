@@ -5,6 +5,7 @@ import XMonad.Config.Azerty (azertyKeys)
 import XMonad.Util.CustomKeys (customKeys)
 import XMonad.Prompt
 import XMonad.Prompt.Shell
+import qualified XMonad.StackSet as W
 
 import Data.Char (isLetter, isDigit)
 import Data.Monoid (Any(..), getAny, (<>))
@@ -17,13 +18,13 @@ main :: IO ()
 main = do
   putEnv "_JAVA_AWT_WM_NONREPARENTING=1"
   putEnv "OOO_FORCE_DESKTOP=gnome"
-  -- setxkbmap
-  -- xsetroot
-  -- xsetbg
-  -- emacs
-  -- clipit
-  -- redshift
-  xmonad $ defaultConfig
+  setxkbmap
+  xsetroot
+  xsetbg
+  emacs
+  clipit
+  redshift
+  xmonad $ def
     { modMask = mod4Mask --  Use Super instead of Alt
     , handleEventHook    = fullscreenEventHook
     , layoutHook         = myLayout
@@ -55,6 +56,8 @@ myPrompt ref = shellPrompt greenXPConfig
                      [ ((controlMask, xK_m), setSuccess True >> setDone True)
                      , ((controlMask, xK_r), historyUpMatching ref)
                      , ((controlMask, xK_s), historyDownMatching ref)
+                     , ((controlMask, xK_n), moveHistory W.focusUp')
+                     , ((controlMask, xK_p), moveHistory W.focusDown')
                      ]
     isLetterOrDigit = getAny . (Any . isLetter <> Any . isDigit)
 
@@ -77,6 +80,6 @@ setxkbmap = spawnProcess "setxkbmap" ["layout fr"]
 
 clipit = spawnProcess "clipit" []
 
-xsetbg = spawnProcess "xsetbg" ["/home/neuville/archdesktop.jpg"]
+xsetbg = spawnProcess "xsetbg" ["/home/neuville/haskell.png"]
 
 redshift = spawnProcess "redshift-gtk" []
