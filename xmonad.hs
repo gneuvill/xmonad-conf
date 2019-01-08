@@ -8,7 +8,7 @@ import XMonad.Prompt.Shell
 
 import Data.Char (isLetter, isDigit)
 import Data.Monoid (Any(..), getAny, (<>))
-import System.Posix.Env (putEnv)
+import System.Posix.Env (putEnv, getEnv)
 import System.Process (spawnProcess)
 
 import qualified Data.Map as M
@@ -17,18 +17,19 @@ main :: IO ()
 main = do
   putEnv "_JAVA_AWT_WM_NONREPARENTING=1"
   putEnv "OOO_FORCE_DESKTOP=gnome"
-  -- setxkbmap
+  gol
+  setxkbmap
   -- xsetroot
-  -- xsetbg
-  -- emacs
-  -- clipit
-  -- redshift
+  xsetbg
+  emacs
+  clipit
+  redshift
   xmonad $ defaultConfig
     { modMask = mod4Mask --  Use Super instead of Alt
     , handleEventHook    = fullscreenEventHook
     , layoutHook         = myLayout
     , borderWidth        = 2
-    , terminal           = "evilvte"
+    , terminal           = "termonad"
     , normalBorderColor  = "#cccccc"
     , focusedBorderColor = "#cd8b00"
     , keys = myKeys <+> azertyKeys <+> keys def
@@ -39,7 +40,7 @@ myKeys = customKeys delkeys inskeys
     delkeys = const []
     inskeys (XConfig {modMask = modm}) =
       [ ((modm .|. shiftMask, xK_p), myPrompt =<< initMatches)
-      , ((modm .|. shiftMask, xK_i), spawn "iceweasel")
+      , ((modm .|. shiftMask, xK_i), spawn "x-www-browser")
       , ((modm .|. shiftMask, xK_e), spawn "cemacs")
       ]
 
@@ -69,14 +70,22 @@ myLayout = tiled ||| Mirror tiled ||| smartBorders Full
      -- Percent of screen to increment by when resizing panes
      delta   = 3/100
 
-emacs = spawnProcess "/home/neuville/bin/semacs" []
+emacs = do
+  mbUser <- getEnv "USER"
+  let user = maybe "neuville" id mbUser
+  spawnProcess ("/home/" ++ user ++ "/bin/semacs") []
 
 xsetroot = spawnProcess "xsetroot" ["cursor_name left_ptr"]
 
 setxkbmap = spawnProcess "setxkbmap" ["layout fr"]
 
-clipit = spawnProcess "clipit" []
+clipit = spawnProcess "parcellite" []
 
-xsetbg = spawnProcess "xsetbg" ["/home/neuville/archdesktop.jpg"]
+xsetbg = spawnProcess "xsetbg" ["~/Images/bg.png"]
 
-redshift = spawnProcess "redshift-gtk" []
+redshift = do
+  spawnProcess "/usr/lib/geoclue-2.0/demos/agent" []
+  spawnProcess "redshift-gtk" []
+
+-- Growl on linux
+gol = spawnProcess "gol" []
