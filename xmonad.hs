@@ -5,6 +5,7 @@ import XMonad.Config.Azerty (azertyKeys)
 import XMonad.Util.CustomKeys (customKeys)
 import XMonad.Prompt
 import XMonad.Prompt.Shell
+import qualified XMonad.StackSet as W
 
 import Data.Char (isLetter, isDigit)
 import Data.Monoid (Any(..), getAny, (<>))
@@ -19,7 +20,7 @@ main = do
   putEnv "OOO_FORCE_DESKTOP=gnome"
   gol
   setxkbmap
-  -- xsetroot
+  xsetroot
   xsetbg
   emacs
   clipit
@@ -56,6 +57,8 @@ myPrompt ref = shellPrompt greenXPConfig
                      [ ((controlMask, xK_m), setSuccess True >> setDone True)
                      , ((controlMask, xK_r), historyUpMatching ref)
                      , ((controlMask, xK_s), historyDownMatching ref)
+                     , ((controlMask, xK_n), moveHistory W.focusUp')
+                     , ((controlMask, xK_p), moveHistory W.focusDown')
                      ]
     isLetterOrDigit = getAny . (Any . isLetter <> Any . isDigit)
 
